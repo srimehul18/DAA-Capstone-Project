@@ -1,0 +1,7 @@
+[
+    {"parcel_id": "P101", "destination": "A", "weight": 5, "priority": 1, "deadline": 10, "value": 80},
+    {"parcel_id": "P102", "destination": "B", "weight": 3, "priority": 2, "deadline": 15, "value": 60},
+    {"parcel_id": "P103", "destination": "C", "weight": 7, "priority": 1, "deadline": 8, "value": 100},
+    {"parcel_id": "P104", "destination": "D", "weight": 4, "priority": 3, "deadline": 20, "value": 40},
+    {"parcel_id": "P105", "destination": "E", "weight": 2, "priority": 2, "deadline": 12, "value": 50}
+]
