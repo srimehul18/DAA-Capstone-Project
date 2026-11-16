@@ -106,3 +106,39 @@ The current Mini-Courier Planner provides a working implementation of sorting, d
 
 These improvements are proposed as future enhancements and are not claimed as implemented features of the current version.
 
+## Experimental Results and Performance Discussion
+
+The performance of the Mini-Courier Planner was evaluated using different input sizes. The execution time of each algorithm was measured in seconds using Python's `time.perf_counter()` function. The median of three repeated measurements was used as the recorded runtime.
+
+### Experimental Results
+
+| Algorithm | Input Size | Runtime (seconds) |
+|---|---:|---:|
+| Merge Sort | 5 | 0.0000150 |
+| Merge Sort | 100 | 0.0004539 |
+| Merge Sort | 500 | 0.0017786 |
+| 0/1 Knapsack | 5 | 0.0002209 |
+| 0/1 Knapsack | 100 | 0.0026856 |
+| 0/1 Knapsack | 500 | 0.0130070 |
+| Dijkstra | 6 | 0.0000152 |
+| Dijkstra | 20 | 0.0000525 |
+| Dijkstra | 50 | 0.0001615 |
+| Nearest Neighbour TSP | 5 | 0.0000765 |
+| Nearest Neighbour TSP | 10 | 0.0002330 |
+| Nearest Neighbour TSP | 15 | 0.0004847 |
+
+### Discussion of Results
+
+**Merge Sort:** The execution time increased from approximately 0.000015 seconds for 5 parcels to 0.001779 seconds for 500 parcels. This demonstrates efficient scaling and is consistent with its O(n log n) time complexity.
+
+**0/1 Knapsack:** The execution time increased from approximately 0.000221 seconds to 0.013007 seconds as the number of parcels increased from 5 to 500. The additional computation is associated with the dynamic programming table, whose complexity depends on both parcel count and capacity.
+
+**Dijkstra:** The execution time increased from approximately 0.000015 seconds for 6 vertices to 0.000162 seconds for 50 vertices. This reflects the additional graph processing required as the number of vertices and edges increases.
+
+**Nearest Neighbour TSP:** The execution time increased from approximately 0.000077 seconds for 5 destinations to 0.000485 seconds for 15 destinations. The repeated shortest-path calculations contribute to the increasing execution time.
+
+### Conclusion
+
+The experimental results indicate that all four algorithms show increasing execution time with increasing input size. Merge Sort performs efficiently for parcel prioritization, while Knapsack requires additional computation to obtain an optimal packing plan. Dijkstra efficiently calculates shortest paths, and Nearest Neighbour provides an approximate delivery route with additional computational overhead.
+
+The measured execution times are specific to the tested environment and input sizes. Since the measurements are very small and only three repetitions were used, minor timing variations may occur across different runs.
