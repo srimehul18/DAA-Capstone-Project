@@ -1,60 +1,77 @@
 import heapq
-def create_graph():
-    """
-    Create an undirected weighted graph using an adjacency list.
-    """
 
+
+def create_graph():
     graph = {
-        "W": [("A", 4), ("B", 2)],
-        "A": [("W", 4), ("B", 1), ("C", 5)],
-        "B": [("W", 2), ("A", 1), ("C", 8), ("D", 7)],
-        "C": [("A", 5), ("B", 8), ("D", 2), ("E", 6)],
-        "D": [("B", 7), ("C", 2), ("E", 3)],
-        "E": [("C", 6), ("D", 3)]
+        "W": {
+            "Dwarka": 4,
+            "Uttam Nagar": 2
+        },
+
+        "Dwarka": {
+            "W": 4,
+            "Uttam Nagar": 1,
+            "Rohini": 5
+        },
+
+        "Uttam Nagar": {
+            "W": 2,
+            "Dwarka": 1,
+            "Rohini": 8,
+            "Hauz Khas": 7
+        },
+
+        "Rohini": {
+            "Dwarka": 5,
+            "Uttam Nagar": 8,
+            "Hauz Khas": 2,
+            "Arjan Garh": 6
+        },
+
+        "Hauz Khas": {
+            "Uttam Nagar": 7,
+            "Rohini": 2,
+            "Arjan Garh": 3
+        },
+
+        "Arjan Garh": {
+            "Rohini": 6,
+            "Hauz Khas": 3
+        }
     }
 
     return graph
 
+
 def dijkstra(graph, source):
-    """
-    Find shortest distances from source to all other vertices.
-    """
-
     distances = {node: float("inf") for node in graph}
-    distances[source] = 0
-
     previous = {node: None for node in graph}
 
-    pq = [(0, source)]
+    distances[source] = 0
+    priority_queue = [(0, source)]
 
-    while pq:
-
-        current_distance, current_node = heapq.heappop(pq)
+    while priority_queue:
+        current_distance, current_node = heapq.heappop(priority_queue)
 
         if current_distance > distances[current_node]:
             continue
 
-        for neighbour, weight in graph[current_node]:
+        for neighbour, weight in graph[current_node].items():
+            distance = current_distance + weight
 
-            new_distance = current_distance + weight
-
-            if new_distance < distances[neighbour]:
-
-                distances[neighbour] = new_distance
+            if distance < distances[neighbour]:
+                distances[neighbour] = distance
                 previous[neighbour] = current_node
 
                 heapq.heappush(
-                    pq, (new_distance, neighbour)
+                    priority_queue,
+                    (distance, neighbour)
                 )
 
     return distances, previous
 
 
 def reconstruct_path(previous, source, destination):
-    """
-    Reconstruct the shortest path using previous nodes.
-    """
-
     path = []
     current = destination
 
@@ -64,7 +81,7 @@ def reconstruct_path(previous, source, destination):
 
     path.reverse()
 
-    if not path or path[0] != source:
+    if path[0] != source:
         return []
 
     return path

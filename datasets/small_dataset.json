@@ -1,7 +1,47 @@
 [
-    {"parcel_id": "P101", "destination": "A", "weight": 5, "priority": 1, "deadline": 10, "value": 80},
-    {"parcel_id": "P102", "destination": "B", "weight": 3, "priority": 2, "deadline": 15, "value": 60},
-    {"parcel_id": "P103", "destination": "C", "weight": 7, "priority": 1, "deadline": 8, "value": 100},
-    {"parcel_id": "P104", "destination": "D", "weight": 4, "priority": 3, "deadline": 20, "value": 40},
-    {"parcel_id": "P105", "destination": "E", "weight": 2, "priority": 2, "deadline": 12, "value": 50}
+    {
+        "parcel_id": "P101",
+        "name": "Shree Vashisht",
+        "destination": "Dwarka",
+        "weight": 5,
+        "priority": 1,
+        "deadline": 10,
+        "value": 80
+    },
+    {
+        "parcel_id": "P102",
+        "name": "Krishna Doot",
+        "destination": "Uttam Nagar",
+        "weight": 3,
+        "priority": 2,
+        "deadline": 15,
+        "value": 60
+    },
+    {
+        "parcel_id": "P103",
+        "name": "Bhupendra Prajapati",
+        "destination": "Rohini",
+        "weight": 7,
+        "priority": 1,
+        "deadline": 8,
+        "value": 100
+    },
+    {
+        "parcel_id": "P104",
+        "name": "Anil Kumar Yadav",
+        "destination": "Hauz Khas",
+        "weight": 4,
+        "priority": 3,
+        "deadline": 20,
+        "value": 40
+    },
+    {
+        "parcel_id": "P105",
+        "name": "Mehul Srivastava",
+        "destination": "Arjan Garh",
+        "weight": 2,
+        "priority": 2,
+        "deadline": 12,
+        "value": 50
+    }
 ]
