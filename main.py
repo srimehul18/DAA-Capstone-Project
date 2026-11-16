@@ -1,22 +1,35 @@
 from pathlib import Path
 
-from sorting import sort_parcels
-
 from parcel_manager import (
     load_parcels,
     display_parcels,
     get_total_weight
 )
 
+from sorting import sort_parcels
+from knapsack import knapsack
+from graph import create_graph, dijkstra
+from route_planner import nearest_neighbour
+
+
 def main():
 
     BASE_DIR = Path(__file__).resolve().parent
+
     dataset_path = BASE_DIR / "datasets" / "small_dataset.json"
+
     parcels = load_parcels(dataset_path)
+
+    if not parcels:
+        print("No parcels available. Exiting.")
+        return
+
     display_parcels(parcels)
+
     sorted_parcels = sort_parcels(parcels)
 
     print("\n========== SORTED PARCELS ==========")
+
     for parcel in sorted_parcels:
         print(
             parcel["parcel_id"],
@@ -24,11 +37,70 @@ def main():
             "| Deadline:", parcel["deadline"]
         )
 
-    total_weight = get_total_weight(parcels)
+    capacity = 10
 
-    print("\n========== SUMMARY ==========")
-    print("Total Parcel Weight:", total_weight, "kg")
+    selected, selected_weight, total_value = knapsack(
+        sorted_parcels, capacity
+    )
 
+    print("\n========== OPTIMAL PACKING PLAN ==========")
+
+    for parcel in selected:
+        print(
+            parcel["parcel_id"],
+            "| Destination:", parcel["destination"],
+            "| Weight:", parcel["weight"], "kg",
+            "| Value:", parcel["value"]
+        )
+
+    print("\nVehicle Capacity:", capacity, "kg")
+    print("Selected Weight:", selected_weight, "kg")
+    print("Total Parcel Value:", total_value)
+
+    if not selected:
+        print("No parcels selected for delivery.")
+        return
+    
+    graph = create_graph()
+
+    print("\n========== SHORTEST PATHS ==========")
+
+    for parcel in selected:
+
+        destination = parcel["destination"]
+
+        distances, previous = dijkstra(graph, "W")
+
+        print(
+            "Warehouse to", destination,
+            "| Distance:", distances[destination], "km"
+        )
+
+    destinations = list(dict.fromkeys(
+        parcel["destination"] for parcel in selected
+    ))
+
+    route, route_distance, complete_path = nearest_neighbour(
+        graph, "W", destinations
+    )
+
+    print("\n========== FINAL DELIVERY ROUTE ==========")
+
+    print("Delivery Order:", " -> ".join(route))
+
+    print("Actual Road Path:", " -> ".join(complete_path))
+
+    print("Total Route Distance:", route_distance, "km")
+
+    print("\n========== COURIER PLANNER SUMMARY ==========")
+
+    print("Total Available Parcels:", len(parcels))
+    print("Selected Parcels:", len(selected))
+    print("Total Original Weight:", get_total_weight(parcels), "kg")
+    print("Vehicle Capacity:", capacity, "kg")
+    print("Selected Weight:", selected_weight, "kg")
+    print("Maximum Selected Value:", total_value)
+    print("Final Delivery Distance:", route_distance, "km")
 
 if __name__ == "__main__":
     main()
