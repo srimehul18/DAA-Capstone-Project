@@ -4,6 +4,7 @@ import random
 import time
 import statistics
 import json
+import shutil
 
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -19,53 +20,77 @@ BASE_DIR = Path(__file__).resolve().parent
 DATASET_DIR = BASE_DIR / "datasets"
 RESULTS_DIR = BASE_DIR / "results"
 
+DATASET_DIR.mkdir(exist_ok=True)
 RESULTS_DIR.mkdir(exist_ok=True)
 
-random.seed(42)
+
+# Benchmark configuration
+SIZES = [10, 50, 100, 500, 1000]
+REPEATS = 5
+SEED = 42
+KNAPSACK_CAPACITY = 100
 
 
-def generate_parcels(n):
+# Chart colours
+COLORS = {
+    "Merge Sort": "#3b82f6",
+    "0/1 Knapsack": "#ff7043",
+    "Dijkstra": "#10b981",
+    "Nearest Neighbour TSP": "#f59e0b"
+}
+
+
+def generate_parcels(n, rng):
+    """Generate reproducible parcel data."""
 
     parcels = []
 
     for i in range(n):
-        parcel = {
+        parcels.append({
             "parcel_id": f"P{i + 1}",
-            "destination": random.choice(["A", "B", "C", "D", "E"]),
-            "weight": random.randint(1, 10),
-            "priority": random.randint(1, 3),
-            "deadline": random.randint(1, 100),
-            "value": random.randint(10, 100)
-        }
-
-        parcels.append(parcel)
+            "destination": f"N{rng.randint(1, n)}",
+            "weight": rng.randint(1, 10),
+            "priority": rng.randint(1, 3),
+            "deadline": rng.randint(1, 100),
+            "value": rng.randint(10, 100)
+        })
 
     return parcels
 
 
+def generate_graph(n, rng):
+    """
+    Generate a connected, sparse, undirected graph.
 
-def generate_graph(n):
-    nodes = ["W"] + [f"N{i}" for i in range(1, n)]
+    W represents the warehouse.
+    N1...Nn represent delivery nodes.
+    Edge weights are illustrative.
+    """
+
+    nodes = ["W"] + [f"N{i}" for i in range(1, n + 1)]
 
     graph = {node: {} for node in nodes}
 
+    # Connect consecutive nodes to guarantee connectivity
     for i in range(len(nodes) - 1):
-        weight = random.randint(1, 20)
+        weight = rng.randint(1, 20)
 
         graph[nodes[i]][nodes[i + 1]] = weight
         graph[nodes[i + 1]][nodes[i]] = weight
 
+    # Add additional sparse connections
     for i in range(len(nodes)):
         for j in range(i + 2, len(nodes)):
-            if random.random() < 0.3:
-                weight = random.randint(1, 20)
+            if rng.random() < 0.003:
+                weight = rng.randint(1, 20)
 
                 graph[nodes[i]][nodes[j]] = weight
                 graph[nodes[j]][nodes[i]] = weight
 
     return graph
 
-def measure_time(function, repeats=3):
+
+def measure_time(function, repeats=REPEATS):
     """
     Measure execution time and return median runtime.
     """
@@ -73,7 +98,6 @@ def measure_time(function, repeats=3):
     times = []
 
     for _ in range(repeats):
-
         start = time.perf_counter()
         function()
         end = time.perf_counter()
@@ -93,13 +117,15 @@ def save_test_datasets():
         "large_dataset.json": 500
     }
 
+    rng = random.Random(SEED)
+
     for filename, size in datasets.items():
 
-        parcels = generate_parcels(size)
+        parcels = generate_parcels(size, rng)
 
         filepath = DATASET_DIR / filename
 
-        with open(filepath, "w") as file:
+        with open(filepath, "w", encoding="utf-8") as file:
             json.dump(parcels, file, indent=4)
 
         print(f"Generated {filename}: {size} parcels")
@@ -109,21 +135,28 @@ def run_performance_tests():
 
     results = []
 
+    print("\n========== PERFORMANCE TESTING ==========")
+    print("Input sizes:", SIZES)
+    print("Repetitions:", REPEATS)
+    print("Random seed:", SEED)
 
-    print("\nTesting Sorting and Knapsack...")
+    for size in SIZES:
 
-    parcel_sizes = [5, 100, 500]
+        print(f"\nTesting input size: {size}")
 
-    for size in parcel_sizes:
+        rng = random.Random(SEED + size)
 
-        parcels = generate_parcels(size)
+        # Generate inputs
+        parcels = generate_parcels(size, rng)
+        graph = generate_graph(size, rng)
 
+        destinations = [
+            f"N{i}" for i in range(1, size + 1)
+        ]
+
+        # 1. Merge Sort
         sorting_time = measure_time(
-            lambda: sort_parcels(parcels.copy())
-        )
-
-        knapsack_time = measure_time(
-            lambda: knapsack(parcels, 100)
+            lambda p=parcels: sort_parcels(p.copy())
         )
 
         results.append({
@@ -132,23 +165,20 @@ def run_performance_tests():
             "Runtime (seconds)": sorting_time
         })
 
+        # 2. 0/1 Knapsack
+        knapsack_time = measure_time(
+            lambda p=parcels: knapsack(p, KNAPSACK_CAPACITY)
+        )
+
         results.append({
             "Algorithm": "0/1 Knapsack",
             "Input Size": size,
             "Runtime (seconds)": knapsack_time
         })
 
-
-    print("Testing Dijkstra...")
-
-    graph_sizes = [6, 20, 50]
-
-    for size in graph_sizes:
-
-        graph = generate_graph(size)
-
+        # 3. Dijkstra
         dijkstra_time = measure_time(
-            lambda: dijkstra(graph, "W")
+            lambda g=graph: dijkstra(g, "W")
         )
 
         results.append({
@@ -157,23 +187,10 @@ def run_performance_tests():
             "Runtime (seconds)": dijkstra_time
         })
 
-
-
-    print("Testing Nearest Neighbour TSP...")
-
-    tsp_sizes = [5, 10, 15]
-
-    for size in tsp_sizes:
-
-        graph = generate_graph(size + 1)
-
-        destinations = [
-            f"N{i}" for i in range(1, size + 1)
-        ]
-
+        # 4. Nearest Neighbour TSP
         tsp_time = measure_time(
-            lambda: nearest_neighbour(
-                graph, "W", destinations
+            lambda g=graph, d=destinations: nearest_neighbour(
+                g, "W", d
             )
         )
 
@@ -182,6 +199,8 @@ def run_performance_tests():
             "Input Size": size,
             "Runtime (seconds)": tsp_time
         })
+
+        print("All four algorithms tested.")
 
     return results
 
@@ -193,7 +212,7 @@ def save_results(results):
 
     filepath = RESULTS_DIR / "runtime_results.csv"
 
-    with open(filepath, "w", newline="") as file:
+    with open(filepath, "w", newline="", encoding="utf-8") as file:
 
         writer = csv.DictWriter(
             file,
@@ -212,42 +231,60 @@ def save_results(results):
 
 def generate_runtime_chart(results):
     """
-    Generate runtime comparison chart.
+    Generate a log-log runtime comparison chart.
     """
 
-    algorithms = list(dict.fromkeys(
-        result["Algorithm"] for result in results
-    ))
+    algorithms = list(COLORS.keys())
 
-    plt.figure(figsize=(10, 6))
+    # Preserve the previous chart before replacing it
+    chart_path = RESULTS_DIR / "runtime_chart.png"
+
+    if chart_path.exists():
+        backup_path = RESULTS_DIR / "runtime_chart_previous.png"
+
+        shutil.copy2(chart_path, backup_path)
+
+        print("Previous chart backed up to:", backup_path)
+
+    plt.figure(figsize=(12, 7))
 
     for algorithm in algorithms:
 
         data = [
-            result for result in results
-            if result["Algorithm"] == algorithm
+            item for item in results
+            if item["Algorithm"] == algorithm
         ]
 
         sizes = [item["Input Size"] for item in data]
+
         runtimes = [
-            item["Runtime (seconds)"] for item in data
+            item["Runtime (seconds)"] * 1000
+            for item in data
         ]
 
-        plt.plot(
+        plt.loglog(
             sizes,
             runtimes,
             marker="o",
+            linewidth=2,
+            markersize=6,
+            color=COLORS[algorithm],
             label=algorithm
         )
 
-    plt.xlabel("Input Size (parcels or vertices)")
-    plt.ylabel("Execution Time (seconds)")
+    plt.xlabel("Input Size (parcels, vertices or destinations)")
+    plt.ylabel("Execution Time (milliseconds)")
     plt.title("Algorithm Runtime Comparison")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
 
-    chart_path = RESULTS_DIR / "runtime_chart.png"
+    plt.grid(
+        True,
+        which="both",
+        linestyle="--",
+        alpha=0.3
+    )
+
+    plt.legend()
+    plt.tight_layout()
 
     plt.savefig(chart_path, dpi=300)
     plt.close()
@@ -257,7 +294,7 @@ def generate_runtime_chart(results):
 
 def main():
 
-    print("========== PERFORMANCE TESTING ==========")
+    print("\n========== PERFORMANCE TESTING ==========")
 
     # Generate datasets
     save_test_datasets()
@@ -265,10 +302,10 @@ def main():
     # Execute benchmarks
     results = run_performance_tests()
 
-    # Save results
+    # Save CSV results
     save_results(results)
 
-    # Generate chart
+    # Generate comparison chart
     generate_runtime_chart(results)
 
     print("\n========== PERFORMANCE TESTING COMPLETED ==========")
