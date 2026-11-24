@@ -107,28 +107,6 @@ def measure_time(function, repeats=REPEATS):
     return statistics.median(times)
 
 
-def save_test_datasets():
-    """
-    Generate and save medium and large parcel datasets.
-    """
-
-    datasets = {
-        "medium_dataset.json": 100,
-        "large_dataset.json": 500
-    }
-
-    rng = random.Random(SEED)
-
-    for filename, size in datasets.items():
-
-        parcels = generate_parcels(size, rng)
-
-        filepath = DATASET_DIR / filename
-
-        with open(filepath, "w", encoding="utf-8") as file:
-            json.dump(parcels, file, indent=4)
-
-        print(f"Generated {filename}: {size} parcels")
 
 
 def run_performance_tests():
@@ -296,8 +274,8 @@ def main():
 
     print("\n========== PERFORMANCE TESTING ==========")
 
-    # Generate datasets
-    save_test_datasets()
+    print("Using generated benchmark inputs.")
+    print("Existing parcel datasets will not be modified.")
 
     # Execute benchmarks
     results = run_performance_tests()
