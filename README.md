@@ -1,144 +1,215 @@
-## Algorithm Complexity Analysis
+# Mini-Courier Planner
 
-The Mini-Courier Planner uses four major algorithms to optimize parcel selection and delivery routing.
+## Project Overview
+
+The **Mini-Courier Planner** is a Python-based application developed as part of the Design and Analysis of Algorithms (ETCCDA302) capstone assignment.
+
+The project simulates a courier delivery planning system that prioritizes parcels, selects an optimal set of packages within a given vehicle capacity, calculates shortest paths between delivery locations and generates an approximate delivery route.
+
+It integrates four major algorithmic techniques:
+
+- Merge Sort
+- 0/1 Knapsack using Dynamic Programming
+- Dijkstra's Shortest Path Algorithm
+- Nearest Neighbour TSP Approximation
+
+## Objectives
+
+- Prioritize parcels based on their priority and delivery deadlines.
+- Select parcels that maximize total value without exceeding vehicle capacity.
+- Calculate shortest paths between the warehouse and delivery locations.
+- Generate an approximate delivery route.
+- Evaluate the runtime performance of the implemented algorithms using different input sizes.
+
+## Technologies Used
+
+- **Programming Language:** Python
+- **Data Storage:** JSON
+- **Performance Measurement:** Python `time` and `statistics` modules
+- **Data Visualization:** Matplotlib
+- **File Handling:** CSV and JSON
+
+## Project Structure
+
+```text
+Mini_Courier_Planner/
+│
+├── datasets/
+│   ├── small_dataset.json
+│   ├── medium_dataset.json
+│   └── large_dataset.json
+│
+├── results/
+│   ├── runtime_chart.png
+│   └── runtime_results.csv
+│
+├── screenshots/
+│
+├── main.py
+├── parcel_manager.py
+├── sorting.py
+├── knapsack.py
+├── graph.py
+├── route_planner.py
+├── performance.py
+├── utils.py
+├── README.md
+└── requirements.txt
+```
+
+## Algorithms Implemented
 
 ### 1. Merge Sort
 
-- **Purpose:** Sorts parcels according to priority and delivery deadline.
-- **Time Complexity:** O(n log n)
-- **Space Complexity:** O(n)
+Used to arrange parcels according to priority and delivery deadlines.
 
-Merge Sort divides the parcel list into smaller sublists, sorts them recursively and merges them into a sorted list. Its time complexity remains O(n log n) across best, average and worst cases.
+- Time Complexity: O(n log n)
+- Space Complexity: O(n)
 
 ### 2. 0/1 Knapsack using Dynamic Programming
 
-- **Purpose:** Selects the parcels that maximize total value without exceeding vehicle weight capacity.
-- **Time Complexity:** O(nW)
-- **Space Complexity:** O(nW)
+Used to select the most valuable combination of parcels without exceeding the vehicle's weight capacity.
 
-The algorithm uses a two-dimensional DP table to compare including and excluding each parcel at different capacity limits. It guarantees an optimal selection for the given integer weights and capacity.
+- Time Complexity: O(nW)
+- Space Complexity: O(nW)
+
+Here, `n` represents the number of parcels and `W` represents the vehicle capacity.
 
 ### 3. Dijkstra's Shortest Path Algorithm
 
-- **Purpose:** Finds the shortest distance from the warehouse or a current delivery point to other locations.
-- **Time Complexity:** O((V + E) log V)
-- **Space Complexity:** O(V + E)
+Used to calculate the shortest distance from the warehouse to delivery locations.
 
-The implementation uses an adjacency-list graph representation and a priority queue implemented using Python's heapq module. It repeatedly selects the vertex with the smallest known distance and relaxes its neighbouring edges.
+- Time Complexity: O((V + E) log V)
+- Space Complexity: O(V + E)
+
+The implementation uses an adjacency-list graph representation and a priority queue.
 
 ### 4. Nearest Neighbour TSP Approximation
 
-- **Purpose:** Determines an approximate delivery order by repeatedly selecting the nearest unvisited destination and finally returning to the warehouse.
-- **Time Complexity:** O(k(V + E) log V + k²)
-- **Space Complexity:** O(V + E + k)
+Used to generate an approximate delivery sequence by repeatedly selecting the nearest unvisited destination and finally returning to the warehouse.
 
-The implementation uses Dijkstra's algorithm to calculate shortest paths between delivery points. It then selects the nearest unvisited destination at each step. This is an approximation technique and does not guarantee the globally optimal travelling-salesperson route.
+The algorithm uses repeated shortest-path calculations to determine the next destination. It does not guarantee the globally optimal route.
 
-### Overall Analysis
+## Dataset Information
 
-Merge Sort efficiently prioritizes parcels, while Dynamic Programming ensures optimal parcel selection within the vehicle capacity. Dijkstra determines shortest paths between locations, and Nearest Neighbour provides a practical approximate delivery sequence.
+The project includes three parcel datasets:
 
-The execution time of the algorithms increases as the input size grows, with the rate of growth depending on their respective time complexities.
+| Dataset | Number of Parcels |
+|---|---:|
+| Small | 5 |
+| Medium | 100 |
+| Large | 500 |
+
+The integrated courier-planning application currently uses the small dataset for its complete parcel selection and route-planning workflow.
+
+The medium and large datasets are also used for performance testing.
+
+## Installation and Execution
+
+### Prerequisites
+
+- Python 3.x
+- Matplotlib
+
+### Install Required Library
+
+Open a terminal in the project directory and execute:
+
+```bash
+pip install matplotlib
+```
+
+### Run the Main Application
+
+```bash
+python main.py
+```
+
+The program performs the following operations:
+
+1. Loads and displays parcel information.
+2. Sorts parcels using Merge Sort.
+3. Selects parcels using the 0/1 Knapsack algorithm.
+4. Calculates shortest paths using Dijkstra's algorithm.
+5. Generates an approximate delivery route using Nearest Neighbour.
+6. Displays the final delivery summary.
+
+### Run Performance Testing
+
+```bash
+python performance.py
+```
+
+The performance script:
+
+- Generates reproducible parcel data and connected weighted graphs.
+- Tests all four algorithms using input sizes of 10, 50, 100, 500 and 1,000.
+- Performs five repetitions for each test.
+- Records the median execution time.
+- Saves the performance results in CSV format.
+- Generates a runtime comparison chart.
+- Generates medium and large parcel datasets.
 
 ## Performance Testing and Analysis
 
-### Testing Environment
+The performance of the four algorithms is evaluated using different input sizes.
 
-The Mini-Courier Planner was tested using different input sizes to observe the execution time of its major algorithms.
+The benchmark configuration is:
 
-The following test sizes were used:
-
-| Algorithm | Input Sizes |
+| Parameter | Value |
 |---|---|
-| Merge Sort | 5, 100, 500 parcels |
-| 0/1 Knapsack | 5, 100, 500 parcels |
-| Dijkstra | 6, 20, 50 vertices |
-| Nearest Neighbour TSP | 5, 10, 15 delivery destinations |
+| Input Sizes | 10, 50, 100, 500, 1,000 |
+| Repetitions | 5 |
+| Measurement | Median Runtime |
+| Knapsack Capacity | 100 |
+| Random Seed | 42 |
 
-The performance tests used generated datasets and weighted graphs. The Knapsack capacity was kept fixed during testing so that the effect of increasing the number of parcels could be observed.
+Execution time is measured using Python's `time.perf_counter()` function.
+
+The results are stored in:
+
+- `results/runtime_results.csv`
+- `results/runtime_chart.png`
 
 ### Performance Observations
 
-**1. Merge Sort**
+**Merge Sort:** Execution time increases as the number of parcels grows, consistent with its O(n log n) time complexity.
 
-The execution time increased as the number of parcels increased. This behaviour is consistent with its O(n log n) time complexity. Merge Sort provides efficient sorting even when the input dataset becomes larger.
+**0/1 Knapsack:** Execution time increases with the number of parcels because the algorithm evaluates different parcel and capacity combinations using dynamic programming.
 
-**2. 0/1 Knapsack**
+**Dijkstra's Algorithm:** Runtime increases with graph size as more vertices and edges need to be processed.
 
-The execution time increased with the number of parcels. The algorithm uses a two-dimensional dynamic programming table, and its performance depends on both the number of parcels and the vehicle capacity. Its time complexity is O(nW).
+**Nearest Neighbour TSP:** This algorithm requires additional computation because it repeatedly invokes shortest-path calculations while constructing the delivery route.
 
-**3. Dijkstra's Algorithm**
+The measurements are specific to the generated datasets and the system on which the tests were performed.
 
-The execution time increased as the number of graph vertices increased. The algorithm uses an adjacency list and a priority queue to calculate shortest paths efficiently.
+## Limitations
 
-**4. Nearest Neighbour TSP**
-
-The execution time increased as the number of delivery destinations increased. The implementation repeatedly calculates shortest paths using Dijkstra's algorithm before selecting the next nearest unvisited destination.
-
-### Comparative Analysis
-
-Merge Sort showed relatively efficient growth with increasing parcel counts. The Knapsack algorithm required more computation because it evaluates different parcel and capacity combinations using dynamic programming.
-
-Dijkstra's algorithm handled the tested graph sizes efficiently. Nearest Neighbour TSP required additional computations because it repeatedly invokes shortest-path calculations while constructing the delivery route.
-
-The observations demonstrate that algorithm selection and input size have a significant effect on execution time.
-
-### Limitations of Performance Testing
-
-- The datasets and graphs are synthetically generated.
+- The integrated application currently uses the small dataset for its complete planning workflow.
+- Medium and large datasets are used for performance benchmarking.
 - Graph edge weights are illustrative and do not represent verified real-world road distances.
-- Execution times may vary depending on system specifications and background processes.
-- The Nearest Neighbour approach is an approximation and does not guarantee the globally optimal delivery route.
+- Nearest Neighbour is an approximation and may not produce the globally shortest delivery route.
+- Execution times may vary depending on hardware and system conditions.
 
-The performance results are therefore used to compare the implemented algorithms under the selected test conditions rather than to establish universal execution-time benchmarks.
+## Future Enhancements
 
-## Optimization Opportunities and Future Improvements
+- Add interactive dataset selection to the main application.
+- Integrate real-world road distance data.
+- Improve route optimization using techniques such as 2-opt.
+- Reduce the space complexity of the Knapsack implementation using a one-dimensional DP table.
+- Cache previously calculated shortest paths to reduce repeated computations.
+- Develop a graphical interface for easier interaction.
 
-The current Mini-Courier Planner provides a working implementation of sorting, dynamic programming and graph-based routing. The following improvements could further enhance its efficiency:
+## Conclusion
 
-1. **Merge Sort:** The existing implementation already provides O(n log n) time complexity. Further improvements could focus on reducing temporary memory allocation during merging.
+The Mini-Courier Planner demonstrates the practical application of sorting, dynamic programming, greedy graph algorithms and approximation techniques in a courier delivery scenario.
 
-2. **0/1 Knapsack:** The current two-dimensional DP table requires O(nW) space. A one-dimensional DP implementation could reduce auxiliary space to O(W), provided capacities are processed in descending order.
+By combining Merge Sort, 0/1 Knapsack, Dijkstra's algorithm and Nearest Neighbour TSP, the application provides a systematic approach to parcel prioritization, packing optimization and delivery route planning.
 
-3. **Dijkstra's Algorithm:** The use of an adjacency list and priority queue is suitable for sparse graphs. Reusing previously calculated shortest-path results could avoid redundant computations when multiple route-planning requests use the same graph.
+Performance testing across multiple input sizes provides an opportunity to observe and compare the behaviour of the implemented algorithms.
 
-4. **Nearest Neighbour TSP:** The route can potentially be improved using local-search techniques such as 2-opt, which attempts to reduce route length by exchanging pairs of route edges.
-
-These improvements are proposed as future enhancements and are not claimed as implemented features of the current version.
-
-## Experimental Results and Performance Discussion
-
-The performance of the Mini-Courier Planner was evaluated using different input sizes. The execution time of each algorithm was measured in seconds using Python's `time.perf_counter()` function. The median of three repeated measurements was used as the recorded runtime.
-
-### Experimental Results
-
-| Algorithm | Input Size | Runtime (seconds) |
-|---|---:|---:|
-| Merge Sort | 5 | 0.0000150 |
-| Merge Sort | 100 | 0.0004539 |
-| Merge Sort | 500 | 0.0017786 |
-| 0/1 Knapsack | 5 | 0.0002209 |
-| 0/1 Knapsack | 100 | 0.0026856 |
-| 0/1 Knapsack | 500 | 0.0130070 |
-| Dijkstra | 6 | 0.0000152 |
-| Dijkstra | 20 | 0.0000525 |
-| Dijkstra | 50 | 0.0001615 |
-| Nearest Neighbour TSP | 5 | 0.0000765 |
-| Nearest Neighbour TSP | 10 | 0.0002330 |
-| Nearest Neighbour TSP | 15 | 0.0004847 |
-
-### Discussion of Results
-
-**Merge Sort:** The execution time increased from approximately 0.000015 seconds for 5 parcels to 0.001779 seconds for 500 parcels. This demonstrates efficient scaling and is consistent with its O(n log n) time complexity.
-
-**0/1 Knapsack:** The execution time increased from approximately 0.000221 seconds to 0.013007 seconds as the number of parcels increased from 5 to 500. The additional computation is associated with the dynamic programming table, whose complexity depends on both parcel count and capacity.
-
-**Dijkstra:** The execution time increased from approximately 0.000015 seconds for 6 vertices to 0.000162 seconds for 50 vertices. This reflects the additional graph processing required as the number of vertices and edges increases.
-
-**Nearest Neighbour TSP:** The execution time increased from approximately 0.000077 seconds for 5 destinations to 0.000485 seconds for 15 destinations. The repeated shortest-path calculations contribute to the increasing execution time.
-
-### Conclusion
-
-The experimental results indicate that all four algorithms show increasing execution time with increasing input size. Merge Sort performs efficiently for parcel prioritization, while Knapsack requires additional computation to obtain an optimal packing plan. Dijkstra efficiently calculates shortest paths, and Nearest Neighbour provides an approximate delivery route with additional computational overhead.
-
-The measured execution times are specific to the tested environment and input sizes. Since the measurements are very small and only three repetitions were used, minor timing variations may occur across different runs.
+The project demonstrates how different algorithmic techniques can be integrated to solve a practical optimization problem.
+ 
+### Author:
+- Mehul Srivasatava
+- 2501730149
