@@ -1,11 +1,5 @@
 from graph import dijkstra, reconstruct_path
 def nearest_neighbour(graph, start, destinations):
-    """
-    Generate an approximate TSP route using Nearest Neighbour.
-
-    Start from the warehouse, visit every selected destination,
-    and return to the warehouse.
-    """
     unvisited = list(dict.fromkeys(
     node for node in destinations if node != start
 ))

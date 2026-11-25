@@ -1,9 +1,4 @@
 def knapsack(parcels, capacity):
-    """
-    Solve the 0/1 Knapsack Problem using Dynamic Programming.
-    Select parcels to maximize total value within weight capacity.
-    """
-
     n = len(parcels)
 
     dp = [[0 for _ in range(capacity + 1)]
